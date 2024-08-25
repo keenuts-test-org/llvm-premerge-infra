@@ -115,13 +115,7 @@ resource "helm_release" "github_actions_runner_set" {
   version    = "0.9.3"
   chart      = "gha-runner-scale-set"
 
-  set {
-    name  = "githubConfigUrl"
-    value = "https://github.com/keenuts-test-org/llvm-ci-testing"
-  }
-
-  set {
-    name  = "githubConfigSecret"
-    value = "github-token"
-  }
+  values = [
+    "${file("linux_runners_values.yaml")}"
+  ]
 }
