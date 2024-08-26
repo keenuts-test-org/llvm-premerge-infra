@@ -63,6 +63,30 @@ resource "google_container_node_pool" "llvm_premerge_linux" {
   }
 }
 
+resource "google_container_node_pool" "llvm_premerge_windows" {
+  name     = "llvm-premerge-windows"
+  location = "us-central1-a"
+  cluster  = google_container_cluster.llvm_premerge.name
+
+  autoscaling {
+    total_min_node_count = 1
+    total_max_node_count = 2
+  }
+
+  node_config {
+    machine_type = "n1-highcpu-8"
+    taint = [{
+      key    = "premerge-platform"
+      value  = "windows"
+      effect = "NO_SCHEDULE"
+    }]
+    labels = {
+      "premerge-platform" : "windows"
+    }
+    image_type = "WINDOWS_LTSC_CONTAINERD"
+  }
+}
+
 provider "helm" {
   kubernetes {
     host                   = google_container_cluster.llvm_premerge.endpoint
