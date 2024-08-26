@@ -22,6 +22,11 @@ resource "google_container_cluster" "llvm_premerge" {
   # node pool and immediately delete it.
   remove_default_node_pool = true
   initial_node_count       = 1
+
+  # Set the networking mode to VPC Native to enable IP aliasing, which is required
+  # for adding windows nodes to the cluster.
+  networking_mode = "VPC_NATIVE"
+  ip_allocation_policy {}
 }
 
 resource "google_container_node_pool" "llvm_premerge_linux_service" {
@@ -118,4 +123,6 @@ resource "helm_release" "github_actions_runner_set" {
   values = [
     "${file("linux_runners_values.yaml")}"
   ]
+
+  depends_on = [kubernetes_namespace.llvm_premerge_linux_runners]
 }
