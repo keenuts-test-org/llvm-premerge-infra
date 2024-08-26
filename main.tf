@@ -46,8 +46,8 @@ resource "google_container_node_pool" "llvm_premerge_linux" {
   cluster  = google_container_cluster.llvm_premerge.name
 
   autoscaling {
-    min_node_count = 1
-    max_node_count = 2
+    total_min_node_count = 1
+    total_max_node_count = 2
   }
 
   node_config {
