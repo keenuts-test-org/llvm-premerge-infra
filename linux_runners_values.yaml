@@ -6,6 +6,11 @@ maxRunners: 2
 
 template:
   spec:
+    tolerations:
+    - key: "premerge-platform"
+      operator: "Equal"
+      value: "linux"
+      effect: "NoSchedule"
     initContainers:
     - name: init-dind-externals
       image: ghcr.io/actions/actions-runner:latest
@@ -51,6 +56,9 @@ template:
           mountPath: /home/runner/_work
         - name: dind-sock
           mountPath: /home/runner/var/run
+      resources:
+        requests:
+          cpu: "7"
     - name: dind
       image: docker:dind-rootless
       args: ["dockerd", "--host=unix:///home/runner/var/run/docker.sock"]

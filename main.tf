@@ -51,6 +51,11 @@ resource "google_container_node_pool" "llvm_premerge_linux" {
 
   node_config {
     machine_type = "n1-highcpu-8"
+    taint = [{
+      key    = "premerge-platform"
+      value  = "linux"
+      effect = "NO_SCHEDULE"
+    }]
   }
 }
 
