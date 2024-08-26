@@ -11,6 +11,8 @@ template:
       operator: "Equal"
       value: "linux"
       effect: "NoSchedule"
+    nodeSelector:
+      premerge-platform: linux
     initContainers:
     - name: init-dind-externals
       image: ghcr.io/actions/actions-runner:latest

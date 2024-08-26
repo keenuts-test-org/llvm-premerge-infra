@@ -46,6 +46,7 @@ resource "google_container_node_pool" "llvm_premerge_linux" {
   cluster  = google_container_cluster.llvm_premerge.name
 
   autoscaling {
+    min_node_count = 1
     max_node_count = 2
   }
 
@@ -56,6 +57,9 @@ resource "google_container_node_pool" "llvm_premerge_linux" {
       value  = "linux"
       effect = "NO_SCHEDULE"
     }]
+    labels = {
+      "premerge-platform" : "linux"
+    }
   }
 }
 
