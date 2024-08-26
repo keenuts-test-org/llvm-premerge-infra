@@ -67,6 +67,7 @@ resource "google_container_node_pool" "llvm_premerge_windows" {
   name     = "llvm-premerge-windows"
   location = "us-central1-a"
   cluster  = google_container_cluster.llvm_premerge.name
+  initial_node_count = 1
 
   autoscaling {
     total_min_node_count = 1
@@ -75,11 +76,6 @@ resource "google_container_node_pool" "llvm_premerge_windows" {
 
   node_config {
     machine_type = "n1-highcpu-8"
-    taint = [{
-      key    = "premerge-platform"
-      value  = "windows"
-      effect = "NO_SCHEDULE"
-    }]
     labels = {
       "premerge-platform" : "windows"
     }
@@ -134,6 +130,25 @@ resource "kubernetes_secret" "github_pat" {
   type = "Opaque"
 }
 
+resource "kubernetes_namespace" "llvm_premerge_windows_runners" {
+  metadata {
+    name = "llvm-premerge-windows-runners"
+  }
+}
+
+resource "kubernetes_secret" "windows_github_pat" {
+  metadata {
+    name      = "github-token"
+    namespace = "llvm-premerge-windows-runners"
+  }
+
+  data = {
+    "github_token" = data.google_secret_manager_secret_version.github_pat.secret_data
+  }
+
+  type = "Opaque"
+}
+
 resource "helm_release" "github_actions_runner_controller" {
   name       = "llvm-premerge-linux"
   namespace  = "llvm-premerge-linux"
@@ -158,4 +173,18 @@ resource "helm_release" "github_actions_runner_set" {
   ]
 
   depends_on = [kubernetes_namespace.llvm_premerge_linux_runners]
+}
+
+resource "helm_release" "github_actions_runner_set_windows" {
+  name       = "llvm-premerge-windows-runners"
+  namespace  = "llvm-premerge-windows-runners"
+  repository = "oci://ghcr.io/actions/actions-runner-controller-charts"
+  version    = "0.9.3"
+  chart      = "gha-runner-scale-set"
+
+  values = [
+    "${file("windows_runner_values.yaml")}"
+  ]
+
+  depends_on = [kubernetes_namespace.llvm_premerge_windows_runners]
 }

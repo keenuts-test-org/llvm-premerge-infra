@@ -1,0 +1,26 @@
+githubConfigUrl: "https://github.com/keenuts-test-org/llvm-ci-testing"
+githubConfigSecret: "github-token"
+
+minRunners: 0
+maxRunners: 2
+
+template:
+  spec:
+    tolerations:
+    - key: "node.kubernetes.io/os"
+      operator: "Equal"
+      value: "windows"
+      effect: "NoSchedule"
+    - key: "premerge-platform"
+      operator: "Equal"
+      value: "windows"
+      effect: "NoSchedule"
+    nodeSelector:
+      premerge-platform: windows
+    containers:
+      - name: runner
+        image: ghcr.io/antgrutta/winrunner:v1.1
+        command: ["/home/runner/run.sh"]
+        resources:
+          requests:
+            cpu: "7"
