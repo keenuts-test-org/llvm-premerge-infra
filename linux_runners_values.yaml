@@ -4,6 +4,15 @@ githubConfigSecret: "github-token"
 minRunners: 0
 maxRunners: 2
 
+containerMode:
+  type: "kubernetes"
+  kubernetesModeWorkVolumeClaim:
+    accessModes: ["ReadWriteOnce"]
+    storageClassName: "standard-rwo"
+    resources:
+      requests:
+        storage: 1Gi
+
 template:
   spec:
     containers:
