@@ -6,3 +6,8 @@ spec:
       effect: "NoSchedule"
   nodeSelector:
     premerge-platform: linux
+  containers:
+  - name: $job
+    resources:
+      requests:
+        cpu: 7
