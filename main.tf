@@ -14,7 +14,7 @@ provider "google" {
 data "google_client_config" "current" {}
 
 resource "google_container_cluster" "llvm_premerge" {
-  name     = "llvm-premerge"
+  name     = "llvm-premerge-prototype"
   location = "europe-west1-b"
 
   # We can't create a cluster with no node pool defined, but we want to only use
