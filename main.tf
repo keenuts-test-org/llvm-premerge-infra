@@ -57,10 +57,10 @@ resource "google_container_node_pool" "llvm_premerge_linux" {
     #  key    = "premerge-platform"
     #  value  = "linux"
     #  effect = "NO_SCHEDULE"
-    #}]
-    #labels = {
-    #  "premerge-platform" : "linux"
-    #}
+    }]
+    labels = {
+      "premerge-platform" : "linux"
+    }
   }
 }
 
@@ -149,6 +149,17 @@ resource "kubernetes_secret" "github_pat" {
 #  type = "Opaque"
 #}
 #
+
+resource "kubernetes_config_map" "linux_container_pod_template" {
+  metadata {
+    name = "linux-container-pod-template"
+    namespace = "llvm-premerge-linux-runners"
+  }
+
+  data = {
+    "linux-container-pod-template.yaml": "${file("linux_container_pod_template.yaml")}"
+  }
+}
 
 resource "helm_release" "github_actions_runner_controller" {
   name       = "llvm-premerge-linux"

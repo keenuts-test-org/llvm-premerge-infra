@@ -15,6 +15,8 @@ containerMode:
 
 template:
   spec:
+    nodeSelector:
+      premerge-platform: linux
     containers:
     - name: runner
       image: ghcr.io/actions/actions-runner:latest
@@ -28,5 +30,14 @@ template:
               fieldPath: metadata.name
         - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
           value: "true"
+        - name: ACTIONS_RUNNER_CONTAINER_HOOK_TEMPLATE
+          value: "/home/runner/pod-config/linux-container-pod-template.yaml"
+      volumeMounts:
+        - name: container-pod-config
+          mountPath: /home/runner/pod-config
     securityContext:
       fsGroup: 123
+    volumes:
+      - name: container-pod-config
+        configMap:
+          name: linux-container-pod-template

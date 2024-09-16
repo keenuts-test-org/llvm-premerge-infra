@@ -1,0 +1,3 @@
+spec:
+  nodeSelector:
+    premerge-platform: linux
