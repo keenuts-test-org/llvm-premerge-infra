@@ -1,3 +1,8 @@
 spec:
+  tolerations:
+    - key: "premerge-platform"
+      operator: "Equal"
+      value: "linux"
+      effect: "NoSchedule"
   nodeSelector:
     premerge-platform: linux
