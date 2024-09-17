@@ -14,7 +14,7 @@ provider "google" {
 data "google_client_config" "current" {}
 
 resource "google_container_cluster" "llvm_premerge" {
-  name     = "llvm-premerge-prototype"
+  name     = var.cluster_name
   location = "europe-west1-b"
 
   # We can't create a cluster with no node pool defined, but we want to only use
@@ -93,8 +93,13 @@ provider "helm" {
     cluster_ca_certificate = base64decode(google_container_cluster.llvm_premerge.master_auth.0.cluster_ca_certificate)
   }
 }
+
 data "google_secret_manager_secret_version" "github_pat" {
   secret = "llvm-premerge-testing-github-pat"
+}
+
+data "google_secret_manager_secret_version" "grafana_token" {
+  secret = "llvm-premerge-testing-grafana-token"
 }
 
 provider "kubernetes" {
@@ -199,4 +204,76 @@ resource "helm_release" "github_actions_runner_set_windows" {
   ]
 
   depends_on = [kubernetes_namespace.llvm_premerge_windows_runners]
+}
+
+resource "helm_release" "grafana-k8s-monitoring" {
+  name             = "grafana-k8s-monitoring"
+  repository       = "https://grafana.github.io/helm-charts"
+  chart            = "k8s-monitoring"
+  namespace        = var.namespace
+  create_namespace = true
+  atomic           = true
+  timeout          = 300
+
+  values = [file("${path.module}/grafana_values.yaml")]
+
+  set {
+    name  = "cluster.name"
+    value = var.cluster_name
+  }
+
+  set {
+    name  = "externalServices.prometheus.host"
+    value = var.externalservices_prometheus_host
+  }
+
+  set_sensitive {
+    name  = "externalServices.prometheus.basicAuth.username"
+    value = var.externalservices_prometheus_basicauth_username
+  }
+
+  set_sensitive {
+    name  = "externalServices.prometheus.basicAuth.password"
+    value = data.google_secret_manager_secret_version.grafana_token.secret_data
+  }
+
+  set {
+    name  = "externalServices.loki.host"
+    value = var.externalservices_loki_host
+  }
+
+  set_sensitive {
+    name  = "externalServices.loki.basicAuth.username"
+    value = var.externalservices_loki_basicauth_username
+  }
+
+  set_sensitive {
+    name  = "externalServices.loki.basicAuth.password"
+    value = data.google_secret_manager_secret_version.grafana_token.secret_data
+  }
+
+  set {
+    name  = "externalServices.tempo.host"
+    value = var.externalservices_tempo_host
+  }
+
+  set_sensitive {
+    name  = "externalServices.tempo.basicAuth.username"
+    value = var.externalservices_tempo_basicauth_username
+  }
+
+  set_sensitive {
+    name  = "externalServices.tempo.basicAuth.password"
+    value = data.google_secret_manager_secret_version.grafana_token.secret_data
+  }
+
+  set {
+    name  = "opencost.opencost.exporter.defaultClusterId"
+    value = var.cluster_name
+  }
+
+  set {
+    name  = "opencost.opencost.prometheus.external.url"
+    value = format("%s/api/prom", var.externalservices_prometheus_host)
+  }
 }
