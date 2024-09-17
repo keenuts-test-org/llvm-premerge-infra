@@ -2,7 +2,7 @@ githubConfigUrl: "https://github.com/keenuts-test-org/llvm-ci-testing"
 githubConfigSecret: "github-token"
 
 minRunners: 0
-maxRunners: 2
+maxRunners: 4
 
 containerMode:
   type: "kubernetes"
@@ -11,7 +11,7 @@ containerMode:
     storageClassName: "standard-rwo"
     resources:
       requests:
-        storage: 1Gi
+        storage: 100Gi
 
 template:
   spec:
