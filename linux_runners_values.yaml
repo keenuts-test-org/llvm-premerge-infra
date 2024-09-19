@@ -28,7 +28,7 @@ template:
       command: ["/home/runner/run.sh"]
       resources:
         requests:
-          cpu: 7
+          cpu: 50
       env:
         - name: ACTIONS_RUNNER_CONTAINER_HOOKS
           value: /home/runner/k8s/index.js

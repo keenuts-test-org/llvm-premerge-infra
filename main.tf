@@ -52,7 +52,7 @@ resource "google_container_node_pool" "llvm_premerge_linux" {
   }
 
   node_config {
-    machine_type = "n1-highcpu-8"
+    machine_type = "c2d-highcpu-56"
     taint = [{
       key    = "premerge-platform"
       value  = "linux"
@@ -71,12 +71,12 @@ resource "google_container_node_pool" "llvm_premerge_windows" {
   initial_node_count = 1
 
   autoscaling {
-    total_min_node_count = 1
-    total_max_node_count = 4
+    total_min_node_count = 0
+    total_max_node_count = 2
   }
 
   node_config {
-    machine_type = "n1-highcpu-8"
+    machine_type = "c2d-highcpu-56"
     labels = {
       "premerge-platform" : "windows"
     }
