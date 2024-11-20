@@ -157,12 +157,12 @@ resource "kubernetes_secret" "windows_github_pat" {
 
 resource "kubernetes_config_map" "linux_container_pod_template" {
   metadata {
-    name = "linux-container-pod-template"
+    name      = "linux-container-pod-template"
     namespace = "llvm-premerge-linux-runners"
   }
 
   data = {
-    "linux-container-pod-template.yaml": "${file("linux_container_pod_template.yaml")}"
+    "linux-container-pod-template.yaml" : "${file("linux_container_pod_template.yaml")}"
   }
 }
 
