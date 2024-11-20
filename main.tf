@@ -74,7 +74,7 @@ resource "google_container_node_pool" "llvm_premerge_linux" {
   name               = "llvm-premerge-linux"
   location           = "europe-west3-a"
   cluster            = google_container_cluster.llvm_premerge.name
-  initial_node_count = 1
+  initial_node_count = 0
 
   autoscaling {
     total_min_node_count = 0
@@ -98,7 +98,7 @@ resource "google_container_node_pool" "llvm_premerge_windows" {
   name               = "llvm-premerge-windows"
   location           = "europe-west3-a"
   cluster            = google_container_cluster.llvm_premerge.name
-  initial_node_count = 1
+  initial_node_count = 0
 
   autoscaling {
     total_min_node_count = 0

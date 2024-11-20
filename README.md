@@ -7,6 +7,15 @@
 - terraform will list the list of proposed changes.
 - enter 'yes' when prompted.
 
+## Setting up the cluster for the first time
+
+```
+terraform apply -target google_container_node_pool.llvm_premerge_linux_service
+terraform apply -target google_container_node_pool.llvm_premerge_linux
+terraform apply -target google_container_node_pool.llvm_premerge_windows
+terraform apply
+```
+
 # Debug
 
 ## Error: Get "http://localhost/api/v1/namespaces/...": dial tcp 127.0.0.1:80: connect: connection refused
