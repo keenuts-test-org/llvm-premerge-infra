@@ -63,7 +63,7 @@ resource "google_container_node_pool" "llvm_premerge_linux_service" {
   name       = "llvm-premerge-linux-service"
   location   = "europe-west3-a"
   cluster    = google_container_cluster.llvm_premerge.name
-  node_count = 1
+  node_count = 2
 
   node_config {
     machine_type = "e2-small"
@@ -306,4 +306,41 @@ resource "helm_release" "grafana-k8s-monitoring" {
     name  = "opencost.opencost.prometheus.external.url"
     value = format("%s/api/prom", var.externalservices_prometheus_host)
   }
+}
+
+data "google_secret_manager_secret_version" "metrics_github_pat" {
+  secret = "llvm-premerge-metrics-github-pat"
+}
+
+data "google_secret_manager_secret_version" "metrics_grafana_api_key" {
+  secret = "llvm-premerge-metrics-grafana-api-key"
+}
+
+data "google_secret_manager_secret_version" "metrics_grafana_metrics_userid" {
+  secret = "llvm-premerge-metrics-grafana-metrics-userid"
+}
+
+resource "kubernetes_namespace" "metrics" {
+  metadata {
+    name = "metrics"
+  }
+}
+
+resource "kubernetes_secret" "metrics_secrets" {
+  metadata {
+    name      = "metrics-secrets"
+    namespace = "metrics"
+  }
+
+  data = {
+    "github-token"           = data.google_secret_manager_secret_version.github_pat.secret_data
+    "grafana-api-key"        = data.google_secret_manager_secret_version.metrics_grafana_api_key.secret_data
+    "grafana-metrics-userid" = data.google_secret_manager_secret_version.metrics_grafana_metrics_userid.secret_data
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_manifest" "metrics_deployment" {
+  manifest = yamldecode(file("metrics_deployment.yaml"))
 }
